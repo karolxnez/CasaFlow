@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Casa Hub</title>
+    <style>
+      :root {
+        --cream: #f7f2ec;
+        --cocoa: #312824;
+        --sage: #8d9b8a;
+        --coral: #a98473;
+        --honey: #d8c4a8;
+        --sky: #97a9aa;
+        --lilac: #b7a9bd;
+        --panel: rgba(255, 252, 248, .82);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--cocoa);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top left, rgba(169, 132, 115, .16), transparent 24rem), linear-gradient(135deg, #f7f2ec, #f4f1ed 48%, #edf2f1);
+      }
+      a { color: inherit; text-decoration: none; }
+      .app { min-height: 100vh; }
+      .sidebar {
+        display: none;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 280px;
+        padding: 20px;
+        border-right: 1px solid rgba(255,255,255,.8);
+        background: rgba(250,247,242,.84);
+        backdrop-filter: blur(14px);
+      }
+      .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+      .brand-icon, .avatar { display: grid; place-items: center; border-radius: 8px; color: white; font-weight: 900; }
+      .brand-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--cocoa), var(--coral)); letter-spacing: -1px; }
+      .profiles, .card {
+        border: 1px solid rgba(255,255,255,.85);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 18px 50px rgba(63, 51, 45, .08);
+      }
+      .profiles { padding: 12px; margin-bottom: 18px; }
+      .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .profile { padding: 8px; border: 1px solid transparent; border-radius: 8px; background: rgba(255,255,255,.65); text-align: center; cursor: pointer; color: var(--cocoa); font-weight: 900; }
+      .profile.active { border-color: var(--cocoa); background: var(--cream); }
+      .avatar { width: 40px; height: 40px; margin: 0 auto 7px; }
+      .nav { display: grid; gap: 5px; }
+      .nav a { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 8px; color: rgba(63,51,45,.72); font-size: 14px; font-weight: 800; }
+      .nav a.active { color: white; background: var(--cocoa); }
+      .mobile-head { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.8); background: rgba(250,247,242,.88); }
+      main { padding: 20px 16px 110px; }
+      .wrap { max-width: 1180px; margin: 0 auto; }
+      .page { display: none; }
+      .page.active { display: block; }
+      .eyebrow { margin: 0 0 8px; color: var(--coral); font-size: 13px; font-weight: 900; text-transform: uppercase; }
+      h1 { margin: 0; font-size: clamp(32px, 6vw, 46px); line-height: 1; }
+      h2 { margin: 0 0 12px; font-size: 20px; }
+      p { line-height: 1.55; }
+      .desc { max-width: 680px; color: rgba(63,51,45,.68); font-weight: 600; }
+      .grid { display: grid; gap: 14px; }
+      .stats { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin: 24px 0 14px; }
+      .two { grid-template-columns: 1fr; }
+      .layout-grid { grid-template-columns: 1fr; }
+      .three { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+      .card { padding: 16px; }
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin: 0 0 18px;
+      }
+      .searchbar {
+        border: 1px solid rgba(49,40,36,.1);
+        border-radius: 8px;
+        background: rgba(255,255,255,.72);
+        padding: 11px 14px;
+        color: rgba(49,40,36,.52);
+        font-weight: 800;
+      }
+      .quick-add {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--cocoa);
+        color: white;
+        padding: 11px 14px;
+        font-weight: 950;
+      }
+      .soft-panel { background: rgba(255,255,255,.54); border-radius: 8px; padding: 14px; }
+      .profile-hero {
+        min-height: calc(100vh - 64px);
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 28px;
+        text-align: center;
+      }
+      .profile-hero h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; }
+      .stream-grid { display: grid; grid-template-columns: repeat(3, minmax(110px, 170px)); gap: clamp(14px, 3vw, 26px); }
+      .stream-profile { border: 0; background: transparent; color: var(--cocoa); }
+      .stream-avatar {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        aspect-ratio: 1;
+        border: 1px solid rgba(49,40,36,.12);
+        border-radius: 8px;
+        box-shadow: 0 22px 60px rgba(49,40,36,.1);
+        color: white;
+        font-size: clamp(34px, 5vw, 54px);
+        font-weight: 900;
+      }
+      .stream-profile span:last-child { display: block; margin-top: 12px; font-size: 17px; font-weight: 800; color: rgba(49,40,36,.68); }
+      .stat { display: flex; justify-content: space-between; gap: 12px; }
+      .stat strong { display: block; margin-top: 4px; font-size: 23px; }
+      .tile { border-radius: 8px; background: white; padding: 13px; }
+      .tile.cream { background: var(--cream); }
+      .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .pill { display: inline-flex; border-radius: 8px; padding: 5px 9px; background: rgba(135,168,120,.17); color: var(--sage); font-size: 11px; font-weight: 900; text-transform: uppercase; white-space: nowrap; }
+      .pill.hot { background: rgba(240,131,109,.17); color: var(--coral); }
+      .pill.warn { background: rgba(246,200,95,.28); color: var(--cocoa); }
+      .pill.blue { background: rgba(122,184,191,.17); color: var(--sky); }
+      .pill.purple { background: rgba(183,156,237,.17); color: var(--lilac); }
+      .muted { color: rgba(63,51,45,.58); font-size: 13px; font-weight: 700; }
+      input, select, button {
+        width: 100%;
+        border: 1px solid rgba(63,51,45,.1);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+      button { border: 0; background: var(--cocoa); color: white; font-weight: 900; cursor: pointer; }
+      .form { display: grid; gap: 10px; }
+      .split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+      .filters button { width: auto; white-space: nowrap; background: white; color: rgba(63,51,45,.72); }
+      .filters button.active { background: var(--cocoa); color: white; }
+      .calendar { display: grid; grid-template-columns: repeat(7, minmax(38px, 1fr)); gap: 8px; }
+      .day { min-height: 64px; border: 1px solid rgba(63,51,45,.1); border-radius: 8px; background: rgba(255,255,255,.72); padding: 8px; font-weight: 800; }
+      .dot { width: 8px; height: 8px; border-radius: 999px; margin-top: 10px; background: var(--coral); }
+      .progress { height: 9px; overflow: hidden; border-radius: 8px; background: rgba(63,51,45,.11); }
+      .progress span { display: block; height: 100%; border-radius: 8px; background: var(--sage); }
+      .mini-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+      .mini-month span { display: grid; place-items: center; min-height: 28px; border-radius: 8px; background: rgba(255,255,255,.58); font-size: 12px; font-weight: 800; color: rgba(49,40,36,.58); }
+      .mini-month .marked { background: var(--cocoa); color: white; }
+      .add-fab {
+        position: fixed;
+        z-index: 25;
+        right: 18px;
+        bottom: 88px;
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border-radius: 8px;
+        background: var(--cocoa);
+        color: white;
+        box-shadow: 0 18px 50px rgba(49,40,36,.22);
+        font-size: 26px;
+        font-weight: 900;
+      }
+      .logo-word { font-weight: 950; letter-spacing: -1px; }
+      .bottom-nav {
+        position: fixed;
+        z-index: 20;
+        inset: auto 0 0;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 8px;
+        border-top: 1px solid rgba(255,255,255,.85);
+        background: rgba(250,247,242,.96);
+        box-shadow: 0 18px 50px rgba(63, 51, 45, .12);
+      }
+      .bottom-nav a { min-width: 82px; border-radius: 8px; padding: 9px 8px; text-align: center; color: rgba(63,51,45,.65); font-size: 11px; font-weight: 900; }
+      .bottom-nav a.active { background: var(--cocoa); color: white; }
+      @media (min-width: 980px) {
+        .sidebar { display: block; }
+        .mobile-head, .bottom-nav { display: none; }
+        .add-fab { right: 32px; bottom: 32px; }
+        main { margin-left: 280px; padding: 32px; }
+        .two { grid-template-columns: 1.2fr .8fr; }
+        .layout-grid { grid-template-columns: 1.2fr .72fr; align-items: start; }
+        .topbar { grid-template-columns: 1fr 170px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-icon">CH</div><div><b class="logo-word" style="font-size:21px">Casa Hub</b><br><span class="muted">Karina, Kaleb e Karolyne</span></div></div>
+        <section class="profiles">
+          <p class="eyebrow">Perfis da casa</p>
+          <div class="profile-grid">
+            <button class="profile active"><span class="avatar" style="background:var(--coral)">K</span>Karina</button>
+            <button class="profile"><span class="avatar" style="background:var(--sky)">K</span>Kaleb</button>
+            <button class="profile"><span class="avatar" style="background:var(--lilac)">K</span>Karolyne</button>
+          </div>
+        </section>
+        <nav class="nav"></nav>
+      </aside>
+      <header class="mobile-head">
+        <div class="brand"><div class="brand-icon">CH</div><div><b class="logo-word">Casa Hub</b><br><span class="muted">Karina, Kaleb e Karolyne</span></div></div>
+        <section class="profiles">
+          <div class="profile-grid">
+            <button class="profile active"><span class="avatar" style="background:var(--coral)">K</span>Karina</button>
+            <button class="profile"><span class="avatar" style="background:var(--sky)">K</span>Kaleb</button>
+            <button class="profile"><span class="avatar" style="background:var(--lilac)">K</span>Karolyne</button>
+          </div>
+        </section>
+      </header>
+      <main><div class="wrap" id="pages"></div></main>
+      <a class="add-fab" href="#adicionar" data-tab="adicionar" aria-label="Adicionar">+</a>
+      <nav class="bottom-nav"></nav>
+    </div>
+    <script>
+      const tabs = [
+        ["perfis", "Perfis"], ["dashboard", "Início"], ["adicionar", "Adicionar"], ["compras", "Compras"], ["comidas", "Comidas"], ["calendario", "Calendário"],
+        ["financas", "Finanças"], ["viagens", "Viagens"], ["filmes", "Filmes"], ["snoopy", "Snoopy"],
+        ["bemestar", "Bem-estar"], ["config", "Ajustes"]
+      ];
+      const pages = {
+        perfis: `
+          <section class="page active"><div class="profile-hero"><div><div class="brand-icon" style="margin:0 auto 18px;width:64px;height:64px">CH</div><p class="eyebrow">Casa Hub</p><h1>Quem está usando?</h1><p class="desc" style="margin-left:auto;margin-right:auto">Escolha um perfil para ver a rotina da casa. Snoopy tem uma área separada para cuidados, gastos e lembretes.</p></div><div class="stream-grid">
+          <button class="stream-profile" data-tab="dashboard"><span class="stream-avatar" style="background:linear-gradient(135deg,#8f6f62,#c6ab9d)">K</span><span>Karina</span></button>
+          <button class="stream-profile" data-tab="dashboard"><span class="stream-avatar" style="background:linear-gradient(135deg,#6f8080,#a9bbba)">K</span><span>Kaleb</span></button>
+          <button class="stream-profile" data-tab="dashboard"><span class="stream-avatar" style="background:linear-gradient(135deg,#90839b,#c5bacb)">K</span><span>Karolyne</span></button>
+          </div><button style="max-width:220px;background:white;color:var(--cocoa);border:1px solid rgba(49,40,36,.12)" data-tab="snoopy">Área do Snoopy</button></div></section>`,
+        dashboard: `
+          <section class="page"><div class="topbar"><div class="searchbar">Buscar conta, compra, filme, evento...</div><a class="quick-add" href="#adicionar" data-tab="adicionar">+ Adicionar</a></div><p class="eyebrow">Bom dia, casa</p><h1>Início</h1><p class="desc">Resumo das prioridades de Karina, Kaleb e Karolyne: contas, compras, filmes, bem-estar e viagem. Snoopy fica em uma área própria.</p>
+          <div class="grid layout-grid" style="margin-top:22px"><div>
+          <div class="grid stats" style="margin-top:0"><div class="card stat"><div><span class="muted">Total do mês</span><strong>R$ 2.942,35</strong><span class="muted">R$ 1.800,00 já pago</span></div></div><div class="card stat"><div><span class="muted">Compras</span><strong>3 pendentes</strong><span class="muted">ração é urgente</span></div></div><div class="card stat"><div><span class="muted">Eventos</span><strong>5 próximos</strong><span class="muted">agenda compartilhada</span></div></div></div>
+          <div class="card"><h2>Próximas prioridades</h2>${tiles(["Conta de luz|14 maio · R$ 119,90|warn","Noite de filme|18 maio · cinema|blue","Reserva da pousada|22 maio · viagem|purple","Mercado do mês|25 maio · lista compartilhada|"])}</div>
+          <div class="grid three" style="margin-top:14px"><div class="card"><h2>Viagem</h2><p class="muted">Campos do Jordão · R$ 1.350 de R$ 2.400</p><div class="progress"><span style="width:56%"></span></div></div><div class="card"><h2>Bem-estar</h2><p class="muted">Humor leve · energia média · sono 7h</p></div></div>
+          </div><aside class="card"><h2>Hoje</h2><div class="mini-month">${Array.from({length:28},(_,i)=>`<span class="${[6,12,18,21].includes(i+1)?"marked":""}">${i+1}</span>`).join("")}</div><div style="height:14px"></div><div class="soft-panel"><b>Área do Snoopy</b><p class="muted">Comprar ração em 6 dias. Banho em 16 maio.</p></div><div style="height:10px"></div><div class="soft-panel"><b>Recado</b><p class="muted">Café especial na cozinha hoje.</p></div></aside></div></section>`,
+        adicionar: `<section class="page"><p class="eyebrow">Entrada rápida</p><h1>Adicionar</h1><p class="desc">Uma aba para sempre registrar algo novo: compra, conta, evento, comida, filme, viagem, Snoopy ou recado.</p><div class="grid two" style="margin-top:22px"><div class="card"><h2>Novo item</h2><div class="form"><input placeholder="Título do que você quer adicionar"><select><option>Lista de compras</option><option>Conta ou gasto</option><option>Evento no calendário</option><option>Comida ou receita</option><option>Filme, série ou cinema</option><option>Viagem</option><option>Snoopy</option><option>Bem-estar / recado</option></select><div class="split"><select><option>Karina</option><option>Kaleb</option><option>Karolyne</option></select><select><option>Prioridade normal</option><option>Urgente</option><option>Baixa</option></select></div><input placeholder="Data, quantidade ou valor"><input placeholder="Observação rápida"><button>Adicionar na Casa Hub</button></div></div><div class="card"><h2>Atalhos</h2>${tiles(["Comprar algo|vai para lista de compras|warn","Lembrar Snoopy|ração, banho, vacina ou consulta|purple","Planejar cinema|lançamento ou noite do filme|blue","Registrar gasto|conta, parcela ou compra da casa|"])}</div></div></section>`,
+        compras: `<section class="page"><p class="eyebrow">Lista integrada</p><h1>Compras</h1><p class="desc">Adicione, marque, remova e limpe itens comprados.</p><div class="grid two"><div class="card"><h2>Adicionar item</h2><div class="form"><input placeholder="Ex: leite, ração, sabão"><div class="split"><select><option>mercado</option><option>limpeza</option><option>pet</option></select><input value="1 un."></div><button>Adicionar</button></div></div><div class="card"><h2>Itens</h2>${checklist(["Ração do Snoopy|pet · alta","Arroz|mercado · média","Desinfetante|limpeza · comprado","Dipirona|farmácia · média"])}</div></div></section>`,
+        comidas: `<section class="page"><p class="eyebrow">Sugestões de refeições</p><h1>Comidas</h1><p class="desc">Filtros para rápido, barato, saudável, air fryer, doce e preguiça.</p><div class="card"><div class="filters"><button class="active">todos</button><button>rápido</button><button>barato</button><button>saudável</button><button>air fryer</button><button>doce</button></div><div class="grid three" style="margin-top:14px">${recipe("Omelete de queijo e tomate","ovos, queijo, tomate","12 min · rápido")}${recipe("Frango crocante na air fryer","frango, panko, páprica","28 min · air fryer")}${recipe("Brownie de caneca","chocolate, farinha, leite","5 min · doce")}</div></div></section>`,
+        calendario: `<section class="page"><p class="eyebrow">Agenda compartilhada</p><h1>Calendário</h1><p class="desc">Eventos, contas, pet e viagem diferenciados por cores.</p><div class="card"><div class="calendar">${Array.from({length:30},(_,i)=>`<div class="day">${i+1}${[14,16,18,22,25].includes(i+1)?'<div class="dot"></div>':''}</div>`).join("")}</div></div></section>`,
+        financas: `<section class="page"><p class="eyebrow">Controle mensal</p><h1>Finanças</h1><p class="desc">Contas fixas, parcelas, gastos, metas e viagem.</p><div class="grid stats"><div class="card"><span class="muted">Total</span><h2>R$ 2.942,35</h2></div><div class="card"><span class="muted">Pago</span><h2>R$ 1.800,00</h2></div><div class="card"><span class="muted">Pendente</span><h2>R$ 1.142,35</h2></div></div><div class="card">${tiles(["Aluguel|10 maio · pago","Internet|15 maio · pendente|warn","Passagens viagem|parcela 2/4 · atrasado|hot"])}</div></section>`,
+        viagens: `<section class="page"><p class="eyebrow">Planos bons</p><h1>Viagens</h1><p class="desc">Destino, orçamento, parcelas, checklist e datas importantes.</p><div class="card"><span class="pill blue">planejando</span><h2 style="font-size:34px;margin-top:12px">Campos do Jordão</h2><p class="muted">12 a 15 julho · R$ 1.350 de R$ 2.400</p><div class="progress"><span style="width:56%"></span></div><div style="height:16px"></div>${checklist(["Reservar pousada","Confirmar pet sitter","Separar casacos","Roteiro de restaurantes"])}</div></section>`,
+        filmes: `<section class="page"><p class="eyebrow">Cinema e streaming</p><h1>Filmes e Séries</h1><p class="desc">Lançamentos no cinema, lista de streaming e noite do filme da casa.</p><div class="card" style="margin-bottom:14px"><h2>Lançamentos no cinema</h2>${movie("Divertida Mente 2","lançamento no cinema · Karolyne","quero assistir")}</div><div class="grid three">${movie("Abbott Elementary","série · Star+ · Karina","assistindo")}${movie("Duna: Parte 2","filme · Max · Kaleb","assistido")}${movie("Próximo cinema","estreia a definir · casa","planejar")}</div></section>`,
+        snoopy: `<section class="page"><p class="eyebrow">Área exclusiva</p><h1>Snoopy</h1><p class="desc">Tudo do Snoopy em um painel separado: ração, banho, vacina, vermífugo, consultas, gastos e saúde.</p><div class="grid stats"><div class="card"><span class="muted">Ração atual</span><h2>1,8kg</h2></div><div class="card"><span class="muted">Gastos</span><h2>R$ 186,90</h2></div><div class="card"><span class="muted">Vacina</span><h2>24 jun</h2></div></div><div class="card">${tiles(["Comprar ração|em 6 dias|hot","Banho|16 maio|warn","Observação|coceira na orelha direita|purple"])}</div></section>`,
+        bemestar: `<section class="page"><p class="eyebrow">Clima da casa</p><h1>Bem-estar</h1><p class="desc">Humor, energia, sono, hábitos leves e recados positivos.</p><div class="grid three">${metric("Humor","leve")}${metric("Energia","média")}${metric("Sono","7h")}</div><div class="card" style="margin-top:14px"><h2>Recado positivo</h2><input placeholder="Escreva um recado para a casa"><br><br><button>Salvar recado</button></div></section>`,
+        config: `<section class="page"><p class="eyebrow">Preferências</p><h1>Configurações</h1><p class="desc">Perfis dos moradores, cores, notificações e categorias.</p><div class="grid three">${profile("Karina","Organização","var(--coral)")}${profile("Kaleb","Finanças","var(--sky)")}${profile("Karolyne","Receitas e filmes","var(--lilac)")}</div></section>`
+      };
+      function tiles(items){return items.map(x=>{const [a,b,c]=x.split("|");return `<div class="tile ${c?"":"cream"}"><div class="row"><b>${a}</b><span class="pill ${c||""}">${c==="hot"?"alta":c==="warn"?"pendente":c==="blue"?"evento":c==="purple"?"viagem":"ok"}</span></div><p class="muted">${b}</p></div>`}).join("")}
+      function checklist(items){return items.map(x=>`<label class="tile row" style="justify-content:flex-start"><input type="checkbox" style="width:20px"> <b>${x.split("|")[0]}</b><span class="muted">${x.split("|")[1]||""}</span></label>`).join("")}
+      function recipe(a,b,c){return `<div class="tile"><span class="pill">${c}</span><h2>${a}</h2><p class="muted">Ingredientes: ${b}</p><p>Preparo resumido com passos simples para o dia a dia.</p><button>Adicionar ingredientes</button></div>`}
+      function movie(a,b,c){return `<div class="card"><span class="pill blue">${c}</span><h2>${a}</h2><p class="muted">${b}</p><div class="tile">Noite de filme: 18 maio · Nota: 5</div></div>`}
+      function metric(a,b){return `<div class="card"><span class="muted">${a}</span><h2>${b}</h2></div>`}
+      function profile(a,b,c){return `<div class="card" style="text-align:center"><span class="avatar" style="width:64px;height:64px;background:${c};font-size:24px">${a[0]}</span><h2>${a}</h2><p class="muted">${b}</p></div>`}
+      document.querySelector("#pages").innerHTML = Object.values(pages).join("");
+      for (const nav of [document.querySelector(".nav"), document.querySelector(".bottom-nav")]) {
+        nav.innerHTML = tabs.map(([id,label],i)=>`<a href="#${id}" data-tab="${id}" class="${i===0?"active":""}">${label}</a>`).join("");
+      }
+      function activateTab(id, updateHash = true) {
+        document.querySelectorAll(".page").forEach((page, index) => page.classList.toggle("active", tabs[index][0] === id));
+        document.querySelectorAll("[data-tab]").forEach(a => a.classList.toggle("active", a.dataset.tab === id));
+        if (updateHash) history.replaceState(null, "", "#" + id);
+        scrollTo({ top: 0, behavior: "smooth" });
+      }
+      const initialTab = location.hash.replace("#", "");
+      if (tabs.some(([id]) => id === initialTab)) {
+        activateTab(initialTab, false);
+      }
+      document.addEventListener("click", event => {
+        const link = event.target.closest("[data-tab]");
+        if (!link) return;
+        event.preventDefault();
+        activateTab(link.dataset.tab);
+      });
+    </script>
+  </body>
+</html>
