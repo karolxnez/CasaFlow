@@ -1,114 +1,167 @@
 "use client";
 
-import { Plus, Trash2, X } from "lucide-react";
+import { Check, Plus, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { shoppingItems } from "@/data/mock";
 import { ShoppingItem } from "@/types/domain";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { StatusPill } from "@/components/ui/StatusPill";
+import { MemberBadge } from "@/components/ui/MemberBadge";
+import { useAppData } from "@/lib/app-data";
+import { getMemberByName, getShortName } from "@/lib/profiles";
 
-const categories: ShoppingItem["category"][] = ["mercado", "limpeza", "pet", "farmacia", "outros"];
-const priorities: ShoppingItem["priority"][] = ["baixa", "media", "alta"];
+const categories: ShoppingItem["category"][] = ["mercado", "limpeza", "pet", "farmacia"];
+const filters = ["pendente", "comprado", "todos"] as const;
+const smartSuggestions: Array<Pick<ShoppingItem, "name" | "category" | "quantity" | "priority">> = [
+  { name: "Leite", category: "mercado", quantity: "1 cx.", priority: "media" },
+  { name: "Ovos", category: "mercado", quantity: "12 un.", priority: "media" },
+  { name: "Racao", category: "pet", quantity: "1 saco", priority: "alta" },
+  { name: "Papel", category: "limpeza", quantity: "1 pct.", priority: "media" }
+];
 
 export function ShoppingList() {
-  const [items, setItems] = useState<ShoppingItem[]>(shoppingItems);
+  const { activeMember, addShoppingItem, clearBoughtItems, removeShoppingItem, shoppingItems: items, toggleShoppingItem } = useAppData();
+  const [filter, setFilter] = useState<(typeof filters)[number]>("pendente");
   const [draft, setDraft] = useState({
     name: "",
     category: "mercado" as ShoppingItem["category"],
     quantity: "1 un.",
-    addedBy: "Karina",
     priority: "media" as ShoppingItem["priority"]
   });
 
   const pendingCount = useMemo(() => items.filter((item) => item.status === "pendente").length, [items]);
+  const filteredItems = useMemo(() => {
+    if (filter === "todos") return items;
+    return items.filter((item) => item.status === filter);
+  }, [filter, items]);
+  const groupedItems = useMemo(() => categories
+    .map((category) => ({
+      category,
+      items: filteredItems.filter((item) => item.category === category)
+    }))
+    .filter((group) => group.items.length > 0), [filteredItems]);
+  const activeMemberItems = useMemo(() => items.filter((item) => item.addedBy === activeMember.name), [activeMember.name, items]);
 
-  function addItem() {
+  function addItem(event?: React.FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
     if (!draft.name.trim()) return;
-    setItems((current) => [
-      {
-        id: crypto.randomUUID(),
-        name: draft.name.trim(),
-        category: draft.category,
-        quantity: draft.quantity,
-        addedBy: draft.addedBy,
-        priority: draft.priority,
-        status: "pendente"
-      },
-      ...current
-    ]);
+    addShoppingItem({
+      name: draft.name.trim(),
+      category: draft.category,
+      quantity: draft.quantity,
+      addedBy: activeMember.name,
+      priority: draft.priority
+    });
     setDraft((current) => ({ ...current, name: "" }));
   }
 
-  function toggleItem(id: string) {
-    setItems((current) =>
-      current.map((item) => (item.id === id ? { ...item, status: item.status === "comprado" ? "pendente" : "comprado" } : item))
-    );
+  function addSuggestion(suggestion: Pick<ShoppingItem, "name" | "category" | "quantity" | "priority">) {
+    addShoppingItem({
+      ...suggestion,
+      addedBy: activeMember.name
+    });
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-      <div className="rounded-[8px] bg-cream p-4">
-        <h2 className="text-lg font-black text-cocoa">Adicionar item</h2>
-        <div className="mt-4 space-y-3">
-          <input
-            className="focus-ring w-full rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm"
-            placeholder="Ex: leite, racao, sabao..."
-            value={draft.name}
-            onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <select className="focus-ring rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm" value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value as ShoppingItem["category"] })}>
-              {categories.map((category) => <option key={category}>{category}</option>)}
-            </select>
-            <input className="focus-ring rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm" value={draft.quantity} onChange={(event) => setDraft({ ...draft, quantity: event.target.value })} />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-cocoa/34">Lista</p>
+          <h2 className="text-lg font-semibold text-cocoa">{pendingCount} pendentes</h2>
+        </div>
+        <MemberBadge member={activeMember} />
+      </div>
+
+      <form className="grid gap-2 rounded-[8px] border border-cocoa/10 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_110px_120px_auto]" onSubmit={addItem}>
+        <input
+          className="focus-ring w-full rounded-[8px] border border-cocoa/10 bg-cocoa/[0.02] px-3 py-2 text-sm"
+          placeholder="Adicionar item"
+          value={draft.name}
+          onChange={(event) => setDraft({ ...draft, name: event.target.value })}
+        />
+        <input
+          className="focus-ring rounded-[8px] border border-cocoa/10 bg-cocoa/[0.02] px-3 py-2 text-sm"
+          value={draft.quantity}
+          onChange={(event) => setDraft({ ...draft, quantity: event.target.value })}
+        />
+        <select className="focus-ring rounded-[8px] border border-cocoa/10 bg-cocoa/[0.02] px-3 py-2 text-sm" value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value as ShoppingItem["category"] })}>
+          {categories.map((category) => <option key={category}>{category}</option>)}
+        </select>
+        <PrimaryButton type="submit" className="px-3">
+          <Plus size={17} /> Adicionar
+        </PrimaryButton>
+      </form>
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {smartSuggestions.map((suggestion) => (
+            <button
+              key={suggestion.name}
+              type="button"
+              onClick={() => addSuggestion(suggestion)}
+              className="focus-ring inline-flex shrink-0 items-center gap-2 rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm font-semibold text-cocoa hover:bg-cocoa/[0.03]"
+            >
+              <Plus size={15} />
+              {suggestion.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 rounded-[8px] border border-cocoa/10 bg-white p-1">
+            {filters.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setFilter(item)}
+                className={`focus-ring rounded-[8px] px-3 py-1.5 text-xs font-semibold uppercase ${filter === item ? "bg-cocoa text-white" : "text-cocoa/55 hover:bg-cocoa/[0.03]"}`}
+              >
+                {item}
+              </button>
+            ))}
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <select className="focus-ring rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm" value={draft.addedBy} onChange={(event) => setDraft({ ...draft, addedBy: event.target.value })}>
-              {["Karina", "Kaleb", "Karolyne"].map((name) => <option key={name}>{name}</option>)}
-            </select>
-            <select className="focus-ring rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm" value={draft.priority} onChange={(event) => setDraft({ ...draft, priority: event.target.value as ShoppingItem["priority"] })}>
-              {priorities.map((priority) => <option key={priority}>{priority}</option>)}
-            </select>
-          </div>
-          <PrimaryButton className="w-full" onClick={addItem}>
-            <Plus size={17} /> Adicionar
-          </PrimaryButton>
+          <button type="button" onClick={clearBoughtItems} className="focus-ring rounded-[8px] p-2 text-cocoa/45 hover:bg-white hover:text-coral" aria-label="Limpar comprados">
+            <X size={17} />
+          </button>
         </div>
       </div>
 
-      <div>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-bold text-cocoa/60">{pendingCount} itens pendentes</p>
-          <PrimaryButton variant="soft" onClick={() => setItems((current) => current.filter((item) => item.status !== "comprado"))}>
-            <X size={16} /> Limpar comprados
-          </PrimaryButton>
-        </div>
-        <div className="space-y-2">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 rounded-[8px] bg-white p-3">
-              <input
-                aria-label={`Marcar ${item.name}`}
-                type="checkbox"
-                checked={item.status === "comprado"}
-                onChange={() => toggleItem(item.id)}
-                className="h-5 w-5 accent-sage"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <strong className={item.status === "comprado" ? "text-cocoa/40 line-through" : "text-cocoa"}>{item.name}</strong>
-                  <StatusPill value={item.priority} />
-                  <StatusPill value={item.status} />
-                </div>
-                <p className="mt-1 text-xs font-semibold text-cocoa/55">
-                  {item.quantity} · {item.category} · adicionado por {item.addedBy}
-                </p>
-              </div>
-              <button className="focus-ring rounded-[8px] p-2 text-cocoa/50 hover:bg-coral/10 hover:text-coral" onClick={() => setItems((current) => current.filter((currentItem) => currentItem.id !== item.id))}>
-                <Trash2 size={17} />
-              </button>
+      <div className="space-y-3">
+        {groupedItems.map((group) => (
+          <section key={group.category}>
+            <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cocoa/34">{group.category}</h2>
+            <div className="grid gap-2 xl:grid-cols-2">
+              {group.items.map((item) => {
+                const owner = getMemberByName(item.addedBy);
+                const bought = item.status === "comprado";
+                return (
+                  <div key={item.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[8px] border border-cocoa/10 bg-white px-3 py-2.5">
+                    <button
+                      aria-label={`Marcar ${item.name}`}
+                      type="button"
+                      onClick={() => toggleShoppingItem(item.id)}
+                      className={`focus-ring flex h-8 w-8 items-center justify-center rounded-[8px] border ${bought ? "border-sage bg-sage text-white" : "border-cocoa/10 text-cocoa/35 hover:bg-cocoa/[0.03]"}`}
+                    >
+                      {bought ? <Check size={17} /> : null}
+                    </button>
+                    <div className="min-w-0">
+                      <strong className={`block truncate text-sm ${bought ? "text-cocoa/35 line-through" : "text-cocoa"}`}>{item.name}</strong>
+                      <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-cocoa/45">
+                        <span className="h-2 w-2 rounded-full" style={{ background: owner.color }} />
+                        <span>{item.quantity}</span>
+                        <span>{getShortName(item.addedBy)}</span>
+                      </div>
+                    </div>
+                    <button className="focus-ring rounded-[8px] p-2 text-cocoa/35 hover:bg-cocoa/[0.04] hover:text-cocoa" onClick={() => removeShoppingItem(item.id)} aria-label={`Remover ${item.name}`}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </section>
+        ))}
+        {!groupedItems.length ? (
+          <p className="rounded-[8px] bg-white px-3 py-4 text-center text-sm font-medium text-cocoa/45">Sem itens.</p>
+        ) : null}
       </div>
     </div>
   );

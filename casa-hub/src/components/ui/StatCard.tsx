@@ -4,23 +4,18 @@ import { AppCard } from "./AppCard";
 type StatCardProps = {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
   icon: LucideIcon;
   tone?: string;
 };
 
-export function StatCard({ label, value, detail, icon: Icon, tone = "bg-coral" }: StatCardProps) {
+export function StatCard({ label, value, detail }: StatCardProps) {
   return (
     <AppCard>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-bold text-cocoa/60">{label}</p>
-          <strong className="mt-1 block text-2xl text-cocoa">{value}</strong>
-          <span className="mt-1 block text-xs font-semibold text-cocoa/55">{detail}</span>
-        </div>
-        <span className={`flex h-10 w-10 items-center justify-center rounded-[8px] text-white ${tone}`}>
-          <Icon size={20} />
-        </span>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-cocoa/38">{label}</p>
+        <strong className="mt-1 block truncate text-lg font-semibold text-cocoa sm:text-[1.15rem]">{value}</strong>
+        {detail ? <span className="mt-1 block truncate text-xs font-medium text-cocoa/48">{detail}</span> : null}
       </div>
     </AppCard>
   );

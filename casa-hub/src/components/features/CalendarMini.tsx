@@ -1,14 +1,9 @@
-import { calendarEvents } from "@/data/mock";
+"use client";
+
 import { StatusPill } from "@/components/ui/StatusPill";
+import { useAppData } from "@/lib/app-data";
 
 const days = Array.from({ length: 30 }, (_, index) => index + 1);
-const eventByDay: Record<number, (typeof calendarEvents)[number]> = {
-  14: calendarEvents[0],
-  16: calendarEvents[1],
-  18: calendarEvents[2],
-  22: calendarEvents[3],
-  25: calendarEvents[4]
-};
 
 const dotClass: Record<string, string> = {
   evento: "bg-sage",
@@ -18,6 +13,13 @@ const dotClass: Record<string, string> = {
 };
 
 export function CalendarMini() {
+  const { calendarEvents } = useAppData();
+  const eventByDay = calendarEvents.reduce<Record<number, (typeof calendarEvents)[number]>>((events, event) => {
+    const day = Number(event.date.match(/\d+/)?.[0]);
+    if (day) events[day] = event;
+    return events;
+  }, {});
+
   return (
     <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="grid grid-cols-7 gap-2">

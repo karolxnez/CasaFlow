@@ -13,10 +13,9 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(169, 132, 115, 0.16), transparent 26rem),
-    linear-gradient(135deg, #f7f2ec 0%, #f4f1ed 48%, #edf2f1 100%);
-  color: #312824;
+  background: #f3f4f6;
+  color: #17181a;
+  line-height: 1.45;
   font-family:
     Inter,
     ui-sans-serif,
@@ -36,6 +35,6 @@ textarea {
 
 @layer components {
   .focus-ring {
-    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral;
+    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cocoa/35;
   }
 }

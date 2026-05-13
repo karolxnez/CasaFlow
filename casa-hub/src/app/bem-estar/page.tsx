@@ -1,14 +1,25 @@
+"use client";
+
 import { HeartHandshake } from "lucide-react";
+import { useState } from "react";
 import { AppCard } from "@/components/ui/AppCard";
 import { EmptyInput } from "@/components/ui/EmptyInput";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { wellnessNotes } from "@/data/mock";
+import { useAppData } from "@/lib/app-data";
 
 export default function BemEstarPage() {
+  const { addQuickItem, wellnessNotes } = useAppData();
+  const [note, setNote] = useState("");
+
+  function saveNote() {
+    addQuickItem({ title: note, type: "recado", owner: "Casa", priority: "baixa", detail: "" });
+    setNote("");
+  }
+
   return (
     <>
-      <PageHeader eyebrow="Clima da casa" title="Bem-estar" description="Humor, energia, sono, habitos leves e recados positivos para cuidar do ambiente." />
+      <PageHeader eyebrow="Clima da casa" title="Bem-estar" />
       <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
         <AppCard>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -24,8 +35,8 @@ export default function BemEstarPage() {
         <AppCard>
           <h2 className="flex items-center gap-2 text-xl font-black text-cocoa"><HeartHandshake size={20} /> Recado positivo</h2>
           <div className="mt-3 space-y-2">
-            <EmptyInput placeholder="Escreva um recado para a casa" />
-            <PrimaryButton className="w-full">Salvar recado</PrimaryButton>
+            <EmptyInput placeholder="Recado para a casa" value={note} onChange={(event) => setNote(event.target.value)} />
+            <PrimaryButton className="w-full" onClick={saveNote}>Salvar</PrimaryButton>
           </div>
         </AppCard>
       </div>

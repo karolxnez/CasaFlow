@@ -5,16 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cream: "#f7f2ec",
-        cocoa: "#312824",
-        sage: "#8d9b8a",
-        coral: "#a98473",
-        honey: "#d8c4a8",
-        skysoft: "#97a9aa",
-        lilac: "#b7a9bd"
+        cream: "#f1f3f5",
+        cocoa: "#17181a",
+        sage: "#667268",
+        coral: "#5f6770",
+        honey: "#e6e9ed",
+        skysoft: "#727a83",
+        lilac: "#7b7680"
       },
       boxShadow: {
-        soft: "0 18px 50px rgba(63, 51, 45, 0.08)"
+        soft: "0 4px 18px rgba(23, 24, 26, 0.06)"
       }
     }
   },

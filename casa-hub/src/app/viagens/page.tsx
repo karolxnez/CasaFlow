@@ -1,16 +1,19 @@
+"use client";
+
 import { CheckCircle2 } from "lucide-react";
 import { ProgressBar } from "@/components/features/ProgressBar";
 import { AppCard } from "@/components/ui/AppCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { trips } from "@/data/mock";
+import { useAppData } from "@/lib/app-data";
 import { currency } from "@/lib/format";
 
 export default function ViagensPage() {
+  const { trips, updateTripSaved } = useAppData();
   const trip = trips[0];
   return (
     <>
-      <PageHeader eyebrow="Planos bons" title="Viagens" description="Destino, orcamento, parcelas, checklist e datas importantes para sair de casa sem correria." />
+      <PageHeader eyebrow="Planos" title="Viagens" />
       <AppCard>
         <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
@@ -22,6 +25,13 @@ export default function ViagensPage() {
               <strong className="text-2xl text-cocoa">{currency(trip.saved)}</strong>
               <p className="mt-1 text-sm text-cocoa/60">orcamento previsto: {currency(trip.budget)}</p>
               <div className="mt-3"><ProgressBar value={trip.saved} total={trip.budget} /></div>
+              <input
+                className="focus-ring mt-4 w-full rounded-[8px] border border-cocoa/10 bg-cream px-3 py-2 text-sm font-semibold text-cocoa"
+                type="number"
+                min={0}
+                value={trip.saved}
+                onChange={(event) => updateTripSaved(Number(event.target.value))}
+              />
             </div>
           </div>
           <div>

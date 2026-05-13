@@ -6,12 +6,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 export default function ComprasPage() {
   return (
     <>
-      <PageHeader
-        eyebrow="Lista integrada"
-        title="Compras"
-        description="Adicione itens, marque como comprado, separe por categoria e mantenha o mercado da casa sob controle."
-        action={<span className="hidden rounded-[8px] bg-white px-3 py-2 text-sm font-black text-cocoa shadow-soft sm:inline-flex"><ShoppingCart size={17} className="mr-2" /> Mock local</span>}
-      />
+      <PageHeader eyebrow="Casa" title="Compras" action={<span className="hidden rounded-[8px] border border-cocoa/10 bg-white px-3 py-2 text-sm font-semibold text-cocoa sm:inline-flex"><ShoppingCart size={17} className="mr-2" /> Lista ativa</span>} />
       <AppCard>
         <ShoppingList />
       </AppCard>

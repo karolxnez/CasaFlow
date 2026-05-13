@@ -5,11 +5,13 @@ import { useState } from "react";
 import { recipes } from "@/data/mock";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { StatusPill } from "@/components/ui/StatusPill";
+import { useAppData } from "@/lib/app-data";
 
 const filters = ["todos", "rapido", "barato", "saudavel", "air fryer", "doce", "preguica"];
 
 export function RecipeCards() {
   const [filter, setFilter] = useState("todos");
+  const { addShoppingItem } = useAppData();
   const visible = filter === "todos" ? recipes : recipes.filter((recipe) => recipe.tags.includes(filter));
 
   return (
@@ -41,10 +43,19 @@ export function RecipeCards() {
             <div className="mt-3 flex flex-wrap gap-2">
               {recipe.tags.map((tag) => <StatusPill key={tag} value={tag} />)}
             </div>
-            <p className="mt-3 text-sm font-semibold text-cocoa/65">Ingredientes: {recipe.ingredients.join(", ")}.</p>
-            <p className="mt-2 text-sm leading-6 text-cocoa/65">{recipe.steps}</p>
-            <PrimaryButton variant="soft" className="mt-4 w-full">
-              <Plus size={16} /> Adicionar ingredientes na lista
+            <p className="mt-3 text-sm font-semibold text-cocoa/65">{recipe.ingredients.join(", ")}</p>
+            <PrimaryButton
+              variant="soft"
+              className="mt-4 w-full"
+              onClick={() => recipe.ingredients.forEach((ingredient) => addShoppingItem({
+                name: ingredient,
+                category: "mercado",
+                quantity: "1 un.",
+                addedBy: "Casa",
+                priority: "media"
+              }))}
+            >
+              <Plus size={16} /> Enviar para compras
             </PrimaryButton>
           </article>
         ))}

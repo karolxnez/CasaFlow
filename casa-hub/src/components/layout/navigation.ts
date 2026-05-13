@@ -13,15 +13,15 @@ import {
 } from "lucide-react";
 
 export const navItems = [
-  { href: "/dashboard", label: "Inicio", icon: Home },
-  { href: "/adicionar", label: "Adicionar", icon: CirclePlus },
+  { href: "/dashboard", label: "Painel", icon: Home },
+  { href: "/adicionar", label: "Registro", icon: CirclePlus },
   { href: "/compras", label: "Compras", icon: ListChecks },
-  { href: "/comidas", label: "Comidas", icon: Soup },
-  { href: "/calendario", label: "Calendario", icon: CalendarDays },
-  { href: "/financas", label: "Financas", icon: CreditCard },
+  { href: "/comidas", label: "Refeicoes", icon: Soup },
+  { href: "/calendario", label: "Agenda", icon: CalendarDays },
+  { href: "/financas", label: "Financeiro", icon: CreditCard },
   { href: "/viagens", label: "Viagens", icon: Luggage },
-  { href: "/filmes-series", label: "Filmes", icon: Clapperboard },
-  { href: "/snoopy", label: "Snoopy", icon: PawPrint },
+  { href: "/filmes-series", label: "Midia", icon: Clapperboard },
+  { href: "/snoopy", label: "Pet", icon: PawPrint },
   { href: "/bem-estar", label: "Bem-estar", icon: HeartHandshake },
-  { href: "/configuracoes", label: "Ajustes", icon: Settings }
+  { href: "/configuracoes", label: "Preferencias", icon: Settings }
 ];
