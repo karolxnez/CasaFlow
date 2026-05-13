@@ -12,6 +12,7 @@ import {
   wellnessNotes
 } from "@/data/mock";
 import { CalendarEvent, FinanceItem, Member, PetReminder, Priority, ShoppingItem, Trip, WatchItem } from "@/types/domain";
+import { ThemeId } from "./themes";
 
 type WellnessNote = (typeof wellnessNotes)[number];
 
@@ -44,8 +45,10 @@ type AppDataContextValue = AppData & {
   removeShoppingItem: (id: string) => void;
   resetData: () => void;
   setActiveMemberId: (id: string) => void;
+  setThemeId: (id: ThemeId) => void;
   toggleFinanceStatus: (id: string) => void;
   toggleShoppingItem: (id: string) => void;
+  themeId: ThemeId;
   updateTripSaved: (value: number) => void;
 };
 
@@ -79,6 +82,7 @@ function parseAmount(value: string) {
 export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>(initialData);
   const [activeMemberId, setActiveMemberId] = useState(members[0].id);
+  const [themeId, setThemeId] = useState<ThemeId>("claro");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -92,6 +96,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       const parsed = JSON.parse(saved);
       setData({ ...initialData, ...(parsed.data ?? parsed) });
       setActiveMemberId(parsed.activeMemberId ?? members[0].id);
+      setThemeId(parsed.themeId ?? "claro");
     } catch {
       window.localStorage.removeItem(storageKey);
     }
@@ -102,15 +107,19 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   function commitData(updater: (current: AppData) => AppData) {
     setData((current) => {
       const next = updater(current);
-      window.localStorage.setItem(storageKey, JSON.stringify({ activeMemberId, data: next }));
+      window.localStorage.setItem(storageKey, JSON.stringify({ activeMemberId, data: next, themeId }));
       return next;
     });
   }
 
   useEffect(() => {
     if (!loaded) return;
-    window.localStorage.setItem(storageKey, JSON.stringify({ activeMemberId, data }));
-  }, [activeMemberId, data, loaded]);
+    window.localStorage.setItem(storageKey, JSON.stringify({ activeMemberId, data, themeId }));
+  }, [activeMemberId, data, loaded, themeId]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = themeId;
+  }, [themeId]);
 
   const value = useMemo<AppDataContextValue>(() => ({
     ...data,
@@ -212,11 +221,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       shoppingItems: current.shoppingItems.filter((item) => item.id !== id)
     })),
     resetData: () => {
-      window.localStorage.setItem(storageKey, JSON.stringify({ activeMemberId: members[0].id, data: initialData }));
+      window.localStorage.setItem(storageKey, JSON.stringify({ activeMemberId: members[0].id, data: initialData, themeId }));
       setActiveMemberId(members[0].id);
       setData(initialData);
     },
     setActiveMemberId,
+    setThemeId,
     toggleFinanceStatus: (id) => commitData((current) => ({
       ...current,
       finances: current.finances.map((item) => item.id === id
@@ -229,11 +239,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         ? { ...item, status: item.status === "comprado" ? "pendente" : "comprado" }
         : item)
     })),
+    themeId,
     updateTripSaved: (value) => commitData((current) => ({
       ...current,
       trips: current.trips.map((trip, index) => index === 0 ? { ...trip, saved: Math.max(0, value) } : trip)
     }))
-  }), [activeMemberId, data]);
+  }), [activeMemberId, data, themeId]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

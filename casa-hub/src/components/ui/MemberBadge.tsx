@@ -10,7 +10,13 @@ type MemberBadgeProps = {
 
 export function MemberBadge({ member, compact, className }: MemberBadgeProps) {
   return (
-    <span className={clsx("inline-flex items-center gap-2 rounded-[8px] border border-cocoa/10 bg-white px-2.5 py-1.5 text-sm font-semibold text-cocoa", className)}>
+    <span
+      className={clsx(
+        "inline-flex items-center gap-2 rounded-[10px] border px-2.5 py-1.5 text-sm font-semibold",
+        "border-[color:var(--app-border)] bg-[var(--app-surface)] text-[color:var(--app-text)]",
+        className
+      )}
+    >
       {compact ? (
         <span className="flex h-5 w-5 items-center justify-center rounded-[6px] text-[10px] font-semibold text-white" style={{ background: member.color }}>
           {member.avatar}

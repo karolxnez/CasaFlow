@@ -11,11 +11,11 @@ type StatCardProps = {
 
 export function StatCard({ label, value, detail }: StatCardProps) {
   return (
-    <AppCard>
+    <AppCard className="bg-[var(--app-surface)]">
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-cocoa/38">{label}</p>
-        <strong className="mt-1 block truncate text-lg font-semibold text-cocoa sm:text-[1.15rem]">{value}</strong>
-        {detail ? <span className="mt-1 block truncate text-xs font-medium text-cocoa/48">{detail}</span> : null}
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">{label}</p>
+        <strong className="mt-1 block truncate text-lg font-semibold text-[color:var(--app-text)] sm:text-[1.15rem]">{value}</strong>
+        {detail ? <span className="mt-1 block truncate text-xs font-medium text-[color:var(--app-muted)]">{detail}</span> : null}
       </div>
     </AppCard>
   );

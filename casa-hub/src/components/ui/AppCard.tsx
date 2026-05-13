@@ -7,7 +7,13 @@ type AppCardProps = {
 
 export function AppCard({ children, className }: AppCardProps) {
   return (
-    <section className={clsx("rounded-[8px] border border-cocoa/10 bg-white/96 p-3.5 shadow-soft sm:p-4", className)}>
+    <section
+      className={clsx(
+        "rounded-[10px] border p-3.5 sm:p-4",
+        "border-[color:var(--app-border)] bg-[var(--app-surface)] shadow-[var(--app-shadow)]",
+        className
+      )}
+    >
       {children}
     </section>
   );
